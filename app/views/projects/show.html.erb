@@ -1,71 +1,72 @@
+<%= link_to 'Back', projects_path, class: "btn btn-link mb-3" %>
 <div class="card">
   <div class="card-body">
-    <h2 class="card-title d-flex justify-content-between mb-4">
+    <h2 class="card-title border-bottom pb-3 d-flex justify-content-between mb-4">
       <span><%= @project.name %></span>
       <div>
-        <%= link_to 'Edit', edit_project_path(@project), class: "btn btn-warning" %> 
+        <%= link_to 'Edit', edit_project_path(@project), class: "btn btn-outline-secondary" %> 
         <%= link_to 'Delete', @project, method: :delete, class:"btn btn-danger", data: { confirm: 'Are you sure?' } %>
       </div>
     </h2>
+
+    <div class="mb-4 border-bottom pb-3">
+      <h3 class="fs-5 mb-3">Add task</h3>
+
+      <%= form_with(model: [@task.project, @task], html: { class: "row g-3"}) do |f| %>
+        <% if @task.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@task.errors.count, "error") %> prohibited this task from being saved:</h2>
+
+          <ul>
+          <% @task.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+          </ul>
+        </div>
+        <% end %>
+        <%# set the status field to 'not-started' by default  %>
+        <%# <%= f.hidden_field :status, value: 'not-started' %>
+        <%# <div class="row gy-4"> %>
+          <div class="col-md-6">
+            <%= f.label :name, class: "visually-hidden", for: "colFormLabelSm" %>
+            <%= f.text_field :name, class: "form-control", id: "colFormLabelSm", placeholder: "Enter task name..." %>
+          </div>
+           <div class="col-md-6">
+            <%= f.select :status, Task::STATUS_OPTIONS, { prompt: "Status" }, class: "form-select" %>
+          </div>
+          <div class="col-md-12">
+            <%= f.label :description, class: "visually-hidden", for: "colFormLabelSm1" %>
+            <%= f.text_area :description, class: "form-control", id: "colFormLabelSm1", placeholder: "Enter task description..." %>
+          </div>
+          <div class="col-12">
+            <%= f.submit class:"btn btn-primary" %>
+          </div>
+        <%# </div> %>
+
+      <% end %>
+    </div>
+   
+
+    <h3 class="fs-4 mb-3">Tasks</h3>
+    <% @project.tasks.each do |task| %>
+      <% if task.persisted? %>
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="badge bg-<%= task.badge_color %> mb-3"><%= task.status %></span>
+              <div>
+                <%= link_to 'Edit', edit_project_task_path(task.project, task), class: "btn btn-outline-secondary btn-sm" %>
+                <%= link_to 'Destroy', [task.project, task], method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
+              </div>
+            </div>
+            <h4 class="fs-5 card-title">
+              <span><%= task.name %></span>
+            </h4>
+            <p><%= task.description %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
   </div>
 </div>
-
-
-<p>
-  <strong>Name:</strong>
-  <%= @project.name %>
-</p>
-
-<p>
-  <strong>Description:</strong>
-  <%= @project.description %>
-</p>
-
-<p>
-  <strong>User:</strong>
-  <%= @project.user_id %>
-</p>
-
-|
-<%= link_to 'Back', projects_path %>
-
-
-<hr>
-
-<h1>New task</h1>
-
-<%= render 'tasks/form' %>
-
-<hr>
-
-<h1>Listing tasks</h1>
-
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Status</th>
-    <th>Project</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @project.tasks.each do |task| %>
-  <% if task.persisted? %>
-    <tr>
-      <td><%= task.name %></td>
-      <td><%= task.description %></td>
-      <td><%= task.status %></td>
-      <td><%= task.project %></td>
-      <td><%= link_to 'Show', [task.project, task] %></td>
-      <td><%= link_to 'Edit', edit_project_task_path(task.project, task) %></td>
-      <td><%= link_to 'Destroy', [task.project, task], method: :delete, data: { confirm: 'Are you sure?' } %></td>
-    </tr>
-  <% end %>
-<% end %>
-</table>
-
-<br />
-
-<%= link_to 'New Task', new_project_task_path(@project.id) %>
